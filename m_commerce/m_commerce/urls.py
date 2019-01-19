@@ -16,7 +16,13 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 
+from m_commerce.views import index
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^index/$',index,name="index"),
     url(r'^users/',include('users.urls',namespace='users')),
+    url(r'^commodity/',include('commodity.urls',namespace='commodity')),
+    url(r'^shopping_car/',include('shopping_car.urls',namespace='shopping_car')),
+    url(r'^indent/',include('indent.urls',namespace='indent')),
 ]

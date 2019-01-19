@@ -39,6 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # 添加子应用
     'users.apps.UsersConfig',
+    'shopping_car.apps.ShoppingCarConfig',
+    'indent.apps.IndentConfig',
+    'commodity.apps.CommodityConfig',
 ]
 
 MIDDLEWARE = [
