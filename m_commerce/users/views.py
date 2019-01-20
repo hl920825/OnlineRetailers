@@ -53,9 +53,11 @@ class LoginView(View):
         form = LoginModelForm(data)
         if form.is_valid():
             # 验证成功
+            # 保存登录标识到session中
             user = form.cleaned_data.get('user')
             request.session['ID'] = user.pk
             request.session['phoneNum'] = user.phoneNum
+            request.session.set_expiry(0)  # 关闭浏览器session消失
             return redirect('index')
         else:
             return render(request,'users/login.html',context={'form':form})
@@ -110,6 +112,14 @@ def allorder(request):
 # ^infor/$
 @check_login
 def infor(request):
+    # if request.method == 'POST':
+    #     pass
+    # else:
+    #     user = Users.objects.get(phoneNum=phone)
+    #     context = {
+    #         'user':user
+    #     }
+
     return render(request, 'users/infor.html')
 
 

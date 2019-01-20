@@ -20,9 +20,9 @@
         {% csrf_token %}
 	    <div style="height: 3rem;"></div>
 	    <input type="text" name="phoneNum" id="mobile" value="{{ request.POST.phoneNum }}" placeholder="请输入用户名/手机号" class="login-name">
-        <p class="text-danger">{{ form.errors.phoneNum.0 }}</p>
+        <p class="am-text-danger">{{ form.errors.phoneNum.0 }}</p>
 	    <input type="password" name="password" id="password" placeholder="请输入密码" class="login-password">
-	    <p class="text-danger">{{ form.errors.password.0 }}</p>
+	    <p class="am-text-danger">{{ form.errors.password.0 }}</p>
 {#        <input type="button" class="login-btn" value="我要登录">#}
         <button type="submit" class="login-btn">登录</button>
 	    <div class="agree">
