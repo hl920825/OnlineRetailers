@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 # Create your views here.
 from django.views import View
@@ -8,11 +8,33 @@ from django.views import View
 # 注册
 # def register(request):
 # #     return render(request, 'users/register.html')
+from users import set_password
+from users.forms import RegisterModelForm, LoginModelForm
+from users.models import Users
+
+
 class RegisterView(View):
     def get(self,request):
         return render(request,'users/register.html')
     def post(self,request):
-        pass
+        # 接收参数
+        data = request.POST
+        # 验证参数合法性
+        form = RegisterModelForm(data)
+        if form.is_valid():
+            # 操作数据库
+            clean_data = form.cleaned_data
+            #
+            user = Users()
+            user.phoneNum = clean_data.get('phoneNum')
+            user.password = set_password(clean_data.get('password'))
+            # 保存
+            user.save()
+
+            return redirect('users:登录')
+        else:
+            # 不合法
+            return render(request,'users/register.html',context={'form':form})
 
 
 # 登录
@@ -22,7 +44,19 @@ class LoginView(View):
     def get(self,request):
         return render(request,'users/login.html')
     def post(self,request):
-        pass
+        # 接收参数
+        data = request.POST
+
+        # 验证合法性
+        form = LoginModelForm(data)
+        if form.is_valid():
+            # 验证成功
+            user = form.cleaned_data.get('user')
+            request.session['ID'] = user.pk
+            request.session['phoneNum'] = user.phoneNum
+            return redirect('index')
+        else:
+            return render(request,'users/login.html',context={'form':form})
 
 # 个人中心
 def personal_center(request):
