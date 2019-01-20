@@ -1,12 +1,13 @@
 from django.conf.urls import url
 
-from users.views import register, login, personal_center, my_wallet, gladdress, address, collect, allorder, infor, \
+from users.views import RegisterView, LoginView, personal_center, my_wallet, gladdress, address, collect, allorder, \
+    infor, \
     integral, integralexchange, integralrecords, job, mymessage, myrecommend, recommend, records, saftystep, step, ygq, \
-    yhq, tureorder
+    yhq, tureorder, forgetpassword
 
 urlpatterns = [
-    url(r'^register/$', register, name="注册"),
-    url(r'^login/$', login, name="注册"),
+    url(r'^register/$', RegisterView.as_view(), name="注册"),
+    url(r'^login/$', LoginView.as_view(), name="登录"),
     url(r'^personal_center/$', personal_center, name="个人中心"),
     url(r'^my_wallet/$', my_wallet, name="我的钱包"),
     url(r'^gladdress/$', gladdress, name="管理收货地址"),
@@ -27,5 +28,6 @@ urlpatterns = [
     url(r'^step/$', step, name='系统设置'),
     url(r'^ygq/$', ygq, name='已过期的红包'),
     url(r'^yhq/$', yhq, name='可使用的红包'),
+    url(r'^forgetpassword/$', forgetpassword, name='忘记密码'),
 
 ]

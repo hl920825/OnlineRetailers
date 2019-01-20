@@ -6,14 +6,23 @@ from django.views import View
 
 
 # 注册
-def register(request):
-    return render(request, 'users/register.html')
+# def register(request):
+# #     return render(request, 'users/register.html')
+class RegisterView(View):
+    def get(self,request):
+        return render(request,'users/register.html')
+    def post(self,request):
+        pass
 
 
 # 登录
-def login(request):
-    return render(request, 'users/login.html')
-
+# def login(request):
+#     return render(request, 'users/login.html')
+class LoginView(View):
+    def get(self,request):
+        return render(request,'users/login.html')
+    def post(self,request):
+        pass
 
 # 个人中心
 def personal_center(request):
@@ -123,3 +132,7 @@ def ygq(request):
 # 我的红包 ---可使用
 def yhq(request):
     return render(request, 'users/yhq.html')
+
+# 忘记密码
+def forgetpassword(request):
+    return render(request,'users/forgetpassword.html')
