@@ -3,7 +3,7 @@ from django.conf.urls import url
 from users.views import RegisterView, LoginView, personal_center, my_wallet, gladdress, address, collect, allorder, \
     infor, \
     integral, integralexchange, integralrecords, job, mymessage, myrecommend, recommend, records, saftystep, step, ygq, \
-    yhq, tureorder, forgetpassword,collect_edit
+    yhq, tureorder, forgetpassword,collect_edit,pay
 
 urlpatterns = [
     url(r'^register/$', RegisterView.as_view(), name="注册"),
@@ -16,6 +16,7 @@ urlpatterns = [
     url(r'^collect_edit/$', collect_edit, name='收藏编辑'),
     url(r'^allorder/$', allorder, name="全部订单"),
     url(r'^tureorder/$', tureorder, name="确认订单"),
+    url(r'^pay/$',pay, name="支付"),
     url(r'^infor/$', infor, name="个人资料"),
     url(r'^integral/$', integral, name="积分"),
     url(r'^integralexchange/$', integralexchange, name="积分兑换"),

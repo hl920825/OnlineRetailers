@@ -27,7 +27,7 @@
 	    </header>
 	    <div style="height: 49px;"></div>
 	    <div class="add-address">
-           <a href="address.html">+新建收货地址</a>
+           <a href="{% url 'users:增加收货地址' %}">+新建收货地址</a>
            <i class="am-icon-angle-right"></i>
         </div>
         <div style="background: #eee; height: 10px;"></div>
@@ -71,7 +71,7 @@
 	    	<div class="order-text">
 	    		应付总额：<span>￥188</span>
 	    	</div>
-	    	<a href="order.html" class="js-btn">提交订单</a>
+	    	<a href="{% url 'users:支付' %}" class="js-btn">提交订单</a>
 	    </div>
 <!--底部-->
  <div style="height: 55px;"></div>

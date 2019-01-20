@@ -118,6 +118,11 @@ def infor(request):
 def tureorder(request):
     return render(request, 'users/tureorder.html')
 
+# 完成支付
+@check_login
+def pay(request):
+    return render(request,'users/pay.html')
+
 
 # 积分
 # ^integral/$

@@ -73,8 +73,8 @@
 	    		<!--底部-->
  <div style=" height: 55px;"></div>
  <ul class="fix-shopping">
- 	<li><a href="shopcart.html" class="join">加入购物车</a></li>
- 	<li><a href="tureorder.html" class="imm-buy">立即购买</a></li>
+ 	<li><a href="{% url 'shopping_car:空购物车' %}" class="join">加入购物车</a></li>
+ 	<li><a href="{% url 'users:确认订单' %}" class="imm-buy">立即购买</a></li>
  </ul>
 	    
 
