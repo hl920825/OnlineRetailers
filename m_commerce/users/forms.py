@@ -11,20 +11,13 @@ class RegisterModelForm(forms.ModelForm):
                                    'min_length':"密码至少为8位",
                                    'max_length':'密码最多为16位',
                                })
-    repassword = forms.CharField(max_length=16,
-                                 min_length=8,
-                                 error_messages={
-                                     'required': '必须填写密码',
-                                     'min_length': "密码至少为8位",
-                                     'max_length': '密码最多为16位',
-                                 })
+    repassword = forms.CharField(error_messages={'required': '必须填写密码'})
     class Meta:
         model = Users
         fields = ['phoneNum']
         error_messages = {
             'phoneNum':{
-                'required':'手机号必须填写',
-                'max_length':'手机号最多为11位'
+                'required':'手机号必须填写'
             }
         }
         # 验证手机号是否存在
@@ -34,14 +27,13 @@ class RegisterModelForm(forms.ModelForm):
         if flag:
             # 存在
             raise forms.ValidationError('该手机号已注册,请重新填写')
-        else:
-            return phoneNum
+        return phoneNum
     def clean(self):
         # 判断两次密码输入是否一致
         pwd = self.cleaned_data.get('password')
         repwd = self.cleaned_data.get('repassword')
         if pwd and repwd and pwd != repwd:
-            raise forms.ValidationError({'repassword':"两次密码不一致"})
+            raise forms.ValidationError({'repassword':"两次密码不一致!"})
         else:
             return self.cleaned_data
 
@@ -60,8 +52,7 @@ class LoginModelForm(forms.ModelForm):
 
         error_messages = {
             'phoneNum':{
-                'required':'手机号必须填写',
-                'max_length':'手机号最多为11位'
+                'required':'手机号必须填写'
             }
         }
     def clean(self):

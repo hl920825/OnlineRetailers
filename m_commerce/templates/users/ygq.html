@@ -30,9 +30,9 @@
 	    <div class="whitebar">
 	    <div data-am-widget="tabs" class="am-tabs am-tabs-d2">
 			<ul class="am-tabs-nav am-cf" style="position: fixed; top: 49px;">
-			    <li class=""><a href="yhq.html">可使用</a></li>
+			    <li class=""><a href="{% url 'users:可使用的红包' %}">可使用</a></li>
 			    <li class=""><a href="">已使用</a></li>
-			    <li class="am-active"><a href="ygq.html">已过期</a></li>
+			    <li class="am-active"><a href="{% url 'users:已过期的红包' %}">已过期</a></li>
 			</ul>
 			<div style="height: 49px;"></div>
 		</div>
