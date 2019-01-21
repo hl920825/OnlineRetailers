@@ -1,20 +1,45 @@
+import random
+import re
+
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
-
 # Create your views here.
 from django.views import View
-
 from users.helper import check_login
+from users import set_password
+from users.forms import RegisterModelForm, LoginModelForm, ForgetModelForm
+from users.models import Users
 
+from django_redis import get_redis_connection
+
+
+
+
+# 发送手机验证码
+def sendMessage(request):
+    try:
+        # 获取手机号码
+        phoneNum = request.GET.get('phoneNum')
+        # 验证手机号是否正确
+        phoneNum_re = re.compile('^1[3-9]\d{9}$')
+        res = re.search(phoneNum_re,phoneNum)
+        if res:
+            # 生成随机验证码
+            code = ''.join([str(random.randint(0,9)) for _ in range(4)])
+            # 保存到session中,等验证的时候使用
+            request.session['session_code'] = code
+            # 设置过期时间
+            request.session.set_expiry(60*60)
+            print(code)
+            print('================')
+
+
+    except:
+        return {'ok':0,'code':500,'msg':'短信验证码发送失败'}
 
 # 注册
 # def register(request):
 # #     return render(request, 'users/register.html')
-from users import set_password
-from users.forms import RegisterModelForm, LoginModelForm
-from users.models import Users
-
-
 class RegisterView(View):
     def get(self,request):
         return render(request,'users/register.html')
@@ -29,6 +54,7 @@ class RegisterView(View):
             #
             user = Users()
             user.phoneNum = clean_data.get('phoneNum')
+            # 加密
             user.password = set_password(clean_data.get('password'))
             # 保存
             user.save()
@@ -141,6 +167,38 @@ def infor(request):
         return render(request, 'users/infor.html', context=context)
 
 
+# 忘记密码
+@check_login
+def forgetpassword(request):
+    if request.method == "POST":
+        # 接收参数
+        data = request.POST
+        # 验证参数合法性
+        form = ForgetModelForm(data)
+        if form.is_valid():
+            # 操作数据库
+            clean_data = form.cleaned_data
+
+            user = Users()
+            user.phoneNum = clean_data.get('phoneNum')
+            # 加密
+            user.password = set_password(clean_data.get('password'))
+            # 保存
+            Users.objects.filter(phoneNum=user.phoneNum).update(password=user.password)
+
+            return redirect('users:登录')
+        else:
+            # 不合法
+            return render(request, 'users/forgetpassword.html', context={'form': form})
+    else:
+        # 通过session得到用户信息
+        user_id = request.session.get('ID')
+        # 到数据库中查询用户信息
+        user_info = Users.objects.filter(id=user_id).first()
+        context = {
+            'user':user_info
+        }
+        return render(request, 'users/forgetpassword.html',context=context)
 
 # 确认订单
 @check_login
@@ -228,7 +286,4 @@ def ygq(request):
 def yhq(request):
     return render(request, 'users/yhq.html')
 
-# 忘记密码
-@check_login
-def forgetpassword(request):
-    return render(request,'users/forgetpassword.html')
+
