@@ -112,15 +112,34 @@ def allorder(request):
 # ^infor/$
 @check_login
 def infor(request):
-    # if request.method == 'POST':
-    #     pass
-    # else:
-    #     user = Users.objects.get(phoneNum=phone)
-    #     context = {
-    #         'user':user
-    #     }
+    if request.method == 'POST':
+        # 获取数据修改数据库
+        id = request.session.get("ID")
+        nickName = request.POST.get("nickName")
+        gender = request.POST.get("gender")
+        school = request.POST.get("school")
+        home_address = request.POST.get("home_address")
+        detail_address =request.POST.get("detail_address")
+        # 修改数据库
+        Users.objects.filter(id=id).update(nickName=nickName,
+                                           gender=gender,
+                                           school=school,
+                                           home_address=home_address,
+                                           detail_address=detail_address)
+        return redirect("users:个人资料")
 
-    return render(request, 'users/infor.html')
+    else:
+        # 通过session得到用户信息
+        user_id = request.session.get("ID")
+        # 到数据库中查询用户信息
+        user_info = Users.objects.filter(id=user_id).first()
+        # print(user_info)
+        context = {
+            "user": user_info
+        }
+
+        return render(request, 'users/infor.html', context=context)
+
 
 
 # 确认订单
