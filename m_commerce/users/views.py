@@ -1,41 +1,93 @@
 import random
 import re
+import uuid
 
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 # Create your views here.
 from django.views import View
-from users.helper import check_login
+from users.helper import check_login,send_sms
 from users import set_password
 from users.forms import RegisterModelForm, LoginModelForm, ForgetModelForm
 from users.models import Users
-
 from django_redis import get_redis_connection
 
-
-
-
 # 发送手机验证码
-def sendMessage(request):
-    try:
-        # 获取手机号码
-        phoneNum = request.GET.get('phoneNum')
-        # 验证手机号是否正确
-        phoneNum_re = re.compile('^1[3-9]\d{9}$')
-        res = re.search(phoneNum_re,phoneNum)
-        if res:
-            # 生成随机验证码
-            code = ''.join([str(random.randint(0,9)) for _ in range(4)])
-            # 保存到session中,等验证的时候使用
-            request.session['session_code'] = code
-            # 设置过期时间
-            request.session.set_expiry(60*60)
-            print(code)
-            print('================')
+class SendMessage(View):
+    def get(self,request):
+        pass
+    def post(self,request):
+        # 1 接收参数
+        phoneNum = request.POST.get('phoneNum','')
+        rs = re.search('^1[3-9]\d{9}$',phoneNum)
+        # 验证参数合法性
+        if rs is None:
+            return JsonResponse({'error':1,'errMsg':'手机号码格式错误!'})
+        # 2.处理数据
+
+        # 模拟
+        # 生成随机验证码
+        # 保存验证码到redis中,存取速度快,并且可以方便的销毁时间
+        # 接入运营商
+
+        # 生成随机验证码   字符串
+        random_code = ''.join([str(random.randint(0,9)) for _ in range(6)])
+        print('=========随机验证码为{}========'.format(random_code))
+
+        # 保存验证码到redis中
+        # 获取连接
+        r = get_redis_connection()
+        # 保存手机号码对应的验证码
+        r.set(phoneNum,random_code)
+        # 设置60秒后过期
+        r.expire(phoneNum,60)
+
+        # 首先获取当前手机号码的发送次数
+        key_times = '{}_times'.format(phoneNum)
+        now_times = r.get(key_times) # 从redis获取的二进制,需要转换
+        # now_times = now_times.decode('utf-8') # 正常转换方式
+        # now_times = int(now_times)
+        # if now_times is None or int(now_times) < 5:
+        #     # 保存手机发送验证码的次数,不能超过5次
+        #     r.incr(key_times)
+        #     # 设置一个过期时间
+        #     r.expire(key_times,60) # 3600
+        # else:
+        #     # 返回 告知用户发送次数过多
+        #     return JsonResponse({'error':1,'errMsg':'发送次数过多!'})
+
+        # 接入运营商
+            # >>>3. 接入运营商
+        __business_id = uuid.uuid1()
+        params = "{\"code\":\"%s\",\"product\":\"黄豆豆是大傻子大超市\"}" % random_code
+        # print(params)
+        rs = send_sms(__business_id, phoneNum, "注册验证", "SMS_2245271", params)
+        print(rs.decode('utf-8'))
 
 
-    except:
-        return {'ok':0,'code':500,'msg':'短信验证码发送失败'}
+        # 3.合成响应
+        return JsonResponse({'error':0})
+
+# def sendMessage(request):
+#     try:
+#         # 获取手机号码
+#         phoneNum = request.GET.get('phoneNum')
+#         # 验证手机号是否正确
+#         phoneNum_re = re.compile('^1[3-9]\d{9}$')
+#         res = re.search(phoneNum_re,phoneNum)
+#         if res:
+#             # 生成随机验证码
+#             code = ''.join([str(random.randint(0,9)) for _ in range(4)])
+#             # 保存到session中,等验证的时候使用
+#             request.session['session_code'] = code
+#             # 设置过期时间
+#             request.session.set_expiry(60*60)
+#             print(code)
+#             print('================')
+#
+#
+#     except:
+#         return {'ok':0,'code':500,'msg':'短信验证码发送失败'}
 
 # 注册
 # def register(request):
@@ -168,25 +220,27 @@ def infor(request):
 
 
 # 忘记密码
-@check_login
 def forgetpassword(request):
     if request.method == "POST":
         # 接收参数
         data = request.POST
+        # phoneNum = data.get('phoneNum')
         # 验证参数合法性
         form = ForgetModelForm(data)
         if form.is_valid():
             # 操作数据库
-            clean_data = form.cleaned_data
+            cleaned_data = form.cleaned_data
 
-            user = Users()
-            user.phoneNum = clean_data.get('phoneNum')
+            # user = Users()
+            # user.phoneNum = clean_data.get('phoneNum')
             # 加密
-            user.password = set_password(clean_data.get('password'))
-            # 保存
-            Users.objects.filter(phoneNum=user.phoneNum).update(password=user.password)
-
+            password = set_password(cleaned_data.get('password'))
+            # # 修改
+            res = Users.objects.filter(id=cleaned_data.get("id")).update(password=password)
+            # if res:
+            #     # 跳转回登录
             return redirect('users:登录')
+            # return redirect('users:忘记密码')
         else:
             # 不合法
             return render(request, 'users/forgetpassword.html', context={'form': form})
@@ -266,7 +320,13 @@ def records(request):
 # 安全设置
 @check_login
 def saftystep(request):
+
     return render(request, 'users/saftystep.html')
+
+# 修改密码
+@check_login
+def changePassword(request):
+    return render(request,'users/password.html')
 
 
 # 系统设置

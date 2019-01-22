@@ -20,22 +20,80 @@
     <form action="" method="post" >
     {% csrf_token %}
 	    <div style="height: 3rem;"></div>
-	    <input type="text" name="phoneNum" value="{{ request.POST.phoneNum }}"  placeholder="请输入手机号" class="login-name">
+	    <input type="text" name="phoneNum" id="phoneNum" value="{{ request.POST.phoneNum }}"  placeholder="请输入手机号" class="login-name">
         <p class="am-text-danger">{{ form.errors.phoneNum.0 }}</p>
 	    <input type="password" name="password"  placeholder="请输入密码" class="login-password">
         <p class="am-text-danger">{{ form.errors.password.0 }}</p>
 	    <input type="password" name="repassword"  placeholder="确认密码" class="login-name">
         <p class="am-text-danger">{{ form.errors.repassword.0}}</p>
 	    <div class="yzm" style="margin-top: 1.5rem;">
-	    	<input type="text" class="reg-yzm" placeholder="输入验证码" />
-	    	<input type="button" class="yzm-hq" value="获取验证码" />
+	    	<input type="text" name="captcha" class="reg-yzm" placeholder="输入验证码" />
+	    	<input type="button" class="yzm-hq"  value="获取验证码" />
 	    </div>
+        <p class="am-text-danger">{{ form.errors.captcha.0}}</p>
 {#	     <input type="button" class="login-btn" value="立即注册">#}
         <button type="submit" class="login-btn">立即注册</button>
 	    <div class="agree">
-	    	<input type="checkbox" name="checkbox" value="同意" checked="">&nbsp;同意
+	    	<input type="checkbox" name="agree" value="同意" checked="">&nbsp;同意
 		    <a href="" class="xy">《用户协议》</a>
 		      <div class="r-login">已有账号，请<a href="{% url 'users:登录' %}" class="l-login">登录</a></div>
-	    </div>
+            <p class="am-text-danger">{{ form.errors.agree.0}}</p>
+        </div>
     </form>
+{% endblock %}
+{% block footer %}
+    <script type="application/javascript">
+        $(function(){
+            //1.绑定点击事件
+            $('.yzm-hq').on('click', function () {
+                //获取手机号码,手机号码上添加一个id
+                var phoneNum = $('#phoneNum').val();
+                var reg = /^1[3-9]\d{9}$/;
+                // 验证手机号
+                if (!reg.test(phoneNum)) {
+                    //验证失败
+                    alert('手机号码格式错误')
+                    return;
+                }
+                var self = this;
+                //发送ajax请求
+                $.ajax({
+                    type:'post',
+                    url:'{% url 'users:发送验证码' %}',
+                    data:{'phoneNum':phoneNum,'csrfmiddlewaretoken':'{{ csrf_token }}'},
+                    dataType:'json',
+                    success:function (data) {
+                        if (data.error == 0) {
+                            //1.按钮变灰
+                            $(self).css('background-color','gray');
+                            //2.按钮不能再点击
+                            $(self).prop('disabled',true);
+                            //3.开始倒计时
+                            var time = 60;
+                            var msg = time + '秒后重新发送';
+                            $(self).val(msg);
+
+                            var timer = window.setInterval(function () {
+                                time -= 1;
+                                if (time == 0){
+                                    //1.按钮变灰
+                                    $(self).css('background-color','#76bb2a');
+                                    //2.按钮不能再点击
+                                    $(self).prop('disabled',false);
+                                    //3.返回原来的文字
+                                    $(self).val("获取验证码");
+                                    window.clearInterval(timer);
+                                    return;
+                                }
+                                msg = time + '秒后重新发送';
+                                $(self).val(msg);
+                            },1000);
+                        }else {
+                            alert(data.errMsg);
+                        }
+                    }
+                })
+            })
+        })
+    </script>
 {% endblock %}

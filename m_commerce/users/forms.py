@@ -1,6 +1,7 @@
 from users import set_password
 from users.models import Users
 from django import forms
+from django_redis import get_redis_connection
 
 class ForgetModelForm(forms.ModelForm):
     # 忘记密码模型
@@ -45,6 +46,13 @@ class RegisterModelForm(forms.ModelForm):
                                    'max_length':'密码最多为16位',
                                })
     repassword = forms.CharField(error_messages={'required': '必须填写密码'})
+    # 验证码
+    captcha = forms.CharField(max_length=6,error_messages={
+                                    'required':'验证码必须填写'
+                                })
+    agree = forms.BooleanField(error_messages={
+                                    'required':'必须同意用户协议'
+                                })
     class Meta:
         model = Users
         fields = ['phoneNum']
@@ -61,14 +69,37 @@ class RegisterModelForm(forms.ModelForm):
             # 存在
             raise forms.ValidationError('该手机号已注册,请重新填写')
         return phoneNum
+
+        # 验证用户传入的验证码和redis中的是否一样
+
+
     def clean(self):
         # 判断两次密码输入是否一致
         pwd = self.cleaned_data.get('password')
         repwd = self.cleaned_data.get('repassword')
         if pwd and repwd and pwd != repwd:
             raise forms.ValidationError({'repassword':"两次密码不一致!"})
-        else:
-            return self.cleaned_data
+
+        # 综合校验
+        try:
+            captcha = self.cleaned_data.get('captchar')
+            phoneNum = self.cleaned_data.get('phoneNum','')
+            # 获取redis中的
+            r = get_redis_connection()
+            random_code = r.get(phoneNum) # 二进制  转码
+            random_code = random_code.decode('utf-8')
+            # 比对
+            if captcha and captcha != random_code:
+                raise forms.ValidationError({'captcha':'验证码输入错误!'})
+        except:
+            raise forms.ValidationError({'captcha':'验证码输入错误!'})
+
+        # 返回清洗后的数据
+        return self.cleaned_data
+
+
+
+
 
 class LoginModelForm(forms.ModelForm):
     # 登录表单模型

@@ -3,7 +3,7 @@ from django.conf.urls import url
 from users.views import RegisterView, LoginView, personal_center, my_wallet, gladdress, address, collect, allorder, \
     infor, \
     integral, integralexchange, integralrecords, job, mymessage, myrecommend, recommend, records, saftystep, step, ygq, \
-    yhq, tureorder, forgetpassword,collect_edit,pay
+    yhq, tureorder, forgetpassword, collect_edit, pay, changePassword, SendMessage
 
 urlpatterns = [
     url(r'^register/$', RegisterView.as_view(), name="注册"),
@@ -31,6 +31,8 @@ urlpatterns = [
     url(r'^ygq/$', ygq, name='已过期的红包'),
     url(r'^yhq/$', yhq, name='可使用的红包'),
     url(r'^forgetpassword/$', forgetpassword, name='忘记密码'),
+    url(r'^changePassword/$', changePassword, name='修改密码'),
+    url(r'^sendmsg/$', SendMessage.as_view(), name='发送验证码'),
 
 
 ]
