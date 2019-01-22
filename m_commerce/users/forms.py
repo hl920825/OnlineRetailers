@@ -3,6 +3,7 @@ from users.models import Users
 from django import forms
 from django_redis import get_redis_connection
 
+
 class ForgetModelForm(forms.ModelForm):
     # 忘记密码模型
     password = forms.CharField(max_length=16,
@@ -13,12 +14,13 @@ class ForgetModelForm(forms.ModelForm):
                                    'max_length': '密码最多为16位',
                                })
     repassword = forms.CharField(error_messages={'required': '必须填写密码'})
+
     def clean(self):
         # 判断两次密码输入是否一致
         pwd = self.cleaned_data.get('password')
         repwd = self.cleaned_data.get('repassword')
         if pwd and repwd and pwd != repwd:
-            raise forms.ValidationError({'repassword':"两次密码不一致!"})
+            raise forms.ValidationError({'repassword': "两次密码不一致!"})
         else:
             return self.cleaned_data
 
@@ -36,32 +38,75 @@ class ForgetModelForm(forms.ModelForm):
             raise forms.ValidationError('密码未修改,请重新输入')
         return password
 
+
+# 修改密码表单类模型
+class ChangeModelForm(forms.ModelForm):
+    user_id = forms.CharField()
+    password = forms.CharField(max_length=16,
+                               min_length=8,
+                               error_messages={
+                                   'required': '必须填写密码',
+                                   'min_length': "密码至少为8位",
+                                   'max_length': '密码最多为16位',
+                               })
+    newpassword1 = forms.CharField(max_length=16,
+                                   min_length=8,
+                                   error_messages={
+                                       'required': '必须填写密码',
+                                       'min_length': "密码至少为8位",
+                                       'max_length': '密码最多为16位',
+                                   })
+    newpassword2 = forms.CharField(error_messages={'required': '必须填写密码'})
+
+    class Meta:
+        model = Users
+        fields = ['password', 'user_id']
+
+    def clean(self):
+        user_id = self.cleaned_data.get('user_id')
+        password = self.cleaned_data.get('password', '')
+        password2 = set_password(password)
+        rs = Users.objects.get(id=user_id)
+        if rs.password != password2:
+            raise forms.ValidationError({'password': "原始密码错误"})
+        # 验证两个新密码是否一致
+        pwd1 = self.cleaned_data.get('newpassword1')
+        pwd2 = self.cleaned_data.get('newpassword2')
+        if pwd1 and pwd2 and pwd1 != pwd2:
+            # 两次密码不同错误
+            raise forms.ValidationError({'newpassword2': '两次密码输入不相同'})
+        # 返回清洗后的数据
+        return self.cleaned_data
+
+
 class RegisterModelForm(forms.ModelForm):
     "注册表单类模型"
     password = forms.CharField(max_length=16,
                                min_length=8,
                                error_messages={
-                                   'required':'必须填写密码',
-                                   'min_length':"密码至少为8位",
-                                   'max_length':'密码最多为16位',
+                                   'required': '必须填写密码',
+                                   'min_length': "密码至少为8位",
+                                   'max_length': '密码最多为16位',
                                })
     repassword = forms.CharField(error_messages={'required': '必须填写密码'})
     # 验证码
-    captcha = forms.CharField(max_length=6,error_messages={
-                                    'required':'验证码必须填写'
-                                })
+    captcha = forms.CharField(max_length=6, error_messages={
+        'required': '验证码必须填写'
+    })
     agree = forms.BooleanField(error_messages={
-                                    'required':'必须同意用户协议'
-                                })
+        'required': '必须同意用户协议'
+    })
+
     class Meta:
         model = Users
         fields = ['phoneNum']
         error_messages = {
-            'phoneNum':{
-                'required':'手机号必须填写'
+            'phoneNum': {
+                'required': '手机号必须填写'
             }
         }
         # 验证手机号是否存在
+
     def clean_phoneNum(self):
         phoneNum = self.cleaned_data.get('phoneNum')
         flag = Users.objects.filter(phoneNum=phoneNum).exists()
@@ -72,33 +117,29 @@ class RegisterModelForm(forms.ModelForm):
 
         # 验证用户传入的验证码和redis中的是否一样
 
-
     def clean(self):
         # 判断两次密码输入是否一致
         pwd = self.cleaned_data.get('password')
         repwd = self.cleaned_data.get('repassword')
         if pwd and repwd and pwd != repwd:
-            raise forms.ValidationError({'repassword':"两次密码不一致!"})
+            raise forms.ValidationError({'repassword': "两次密码不一致!"})
 
         # 综合校验
         try:
             captcha = self.cleaned_data.get('captchar')
-            phoneNum = self.cleaned_data.get('phoneNum','')
+            phoneNum = self.cleaned_data.get('phoneNum', '')
             # 获取redis中的
             r = get_redis_connection()
-            random_code = r.get(phoneNum) # 二进制  转码
+            random_code = r.get(phoneNum)  # 二进制  转码
             random_code = random_code.decode('utf-8')
             # 比对
             if captcha and captcha != random_code:
-                raise forms.ValidationError({'captcha':'验证码输入错误!'})
+                raise forms.ValidationError({'captcha': '验证码输入错误!'})
         except:
-            raise forms.ValidationError({'captcha':'验证码输入错误!'})
+            raise forms.ValidationError({'captcha': '验证码输入错误!'})
 
         # 返回清洗后的数据
         return self.cleaned_data
-
-
-
 
 
 class LoginModelForm(forms.ModelForm):
@@ -110,15 +151,17 @@ class LoginModelForm(forms.ModelForm):
                                    'min_length': "密码至少为8位",
                                    'max_length': '密码最多为16位',
                                })
+
     class Meta:
         model = Users
-        fields =['phoneNum']
+        fields = ['phoneNum']
 
         error_messages = {
-            'phoneNum':{
-                'required':'手机号必须填写'
+            'phoneNum': {
+                'required': '手机号必须填写'
             }
         }
+
     def clean(self):
         # 验证手机号
         phoneNum = self.cleaned_data.get('phoneNum')
@@ -126,15 +169,13 @@ class LoginModelForm(forms.ModelForm):
         try:
             user = Users.objects.get(phoneNum=phoneNum)
         except Users.DoesNotExist:
-            raise forms.ValidationError({'phoneNum':'手机号不存在'})
+            raise forms.ValidationError({'phoneNum': '手机号不存在'})
 
         # 验证密码
-        password = self.cleaned_data.get('password','')
+        password = self.cleaned_data.get('password', '')
         if user.password != set_password(password):
-            raise forms.ValidationError({'password':'密码错误'})
+            raise forms.ValidationError({'password': '密码错误'})
 
         # 返回所有清洗后的数据
         self.cleaned_data['user'] = user
         return self.cleaned_data
-
-

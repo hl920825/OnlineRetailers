@@ -6,23 +6,25 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 # Create your views here.
 from django.views import View
-from users.helper import check_login,send_sms
+from users.helper import check_login, send_sms
 from users import set_password
-from users.forms import RegisterModelForm, LoginModelForm, ForgetModelForm
+from users.forms import RegisterModelForm, LoginModelForm, ForgetModelForm, ChangeModelForm
 from users.models import Users
 from django_redis import get_redis_connection
 
+
 # 发送手机验证码
 class SendMessage(View):
-    def get(self,request):
+    def get(self, request):
         pass
-    def post(self,request):
+
+    def post(self, request):
         # 1 接收参数
-        phoneNum = request.POST.get('phoneNum','')
-        rs = re.search('^1[3-9]\d{9}$',phoneNum)
+        phoneNum = request.POST.get('phoneNum', '')
+        rs = re.search('^1[3-9]\d{9}$', phoneNum)
         # 验证参数合法性
         if rs is None:
-            return JsonResponse({'error':1,'errMsg':'手机号码格式错误!'})
+            return JsonResponse({'error': 1, 'errMsg': '手机号码格式错误!'})
         # 2.处理数据
 
         # 模拟
@@ -31,20 +33,20 @@ class SendMessage(View):
         # 接入运营商
 
         # 生成随机验证码   字符串
-        random_code = ''.join([str(random.randint(0,9)) for _ in range(6)])
+        random_code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
         print('=========随机验证码为{}========'.format(random_code))
 
         # 保存验证码到redis中
         # 获取连接
         r = get_redis_connection()
         # 保存手机号码对应的验证码
-        r.set(phoneNum,random_code)
+        r.set(phoneNum, random_code)
         # 设置60秒后过期
-        r.expire(phoneNum,60)
+        r.expire(phoneNum, 60)
 
         # 首先获取当前手机号码的发送次数
         key_times = '{}_times'.format(phoneNum)
-        now_times = r.get(key_times) # 从redis获取的二进制,需要转换
+        now_times = r.get(key_times)  # 从redis获取的二进制,需要转换
         # now_times = now_times.decode('utf-8') # 正常转换方式
         # now_times = int(now_times)
         # if now_times is None or int(now_times) < 5:
@@ -57,16 +59,16 @@ class SendMessage(View):
         #     return JsonResponse({'error':1,'errMsg':'发送次数过多!'})
 
         # 接入运营商
-            # >>>3. 接入运营商
+        # >>>3. 接入运营商
         __business_id = uuid.uuid1()
         params = "{\"code\":\"%s\",\"product\":\"黄豆豆是大傻子大超市\"}" % random_code
         # print(params)
         rs = send_sms(__business_id, phoneNum, "注册验证", "SMS_2245271", params)
         print(rs.decode('utf-8'))
 
-
         # 3.合成响应
-        return JsonResponse({'error':0})
+        return JsonResponse({'error': 0})
+
 
 # def sendMessage(request):
 #     try:
@@ -93,9 +95,10 @@ class SendMessage(View):
 # def register(request):
 # #     return render(request, 'users/register.html')
 class RegisterView(View):
-    def get(self,request):
-        return render(request,'users/register.html')
-    def post(self,request):
+    def get(self, request):
+        return render(request, 'users/register.html')
+
+    def post(self, request):
         # 接收参数
         data = request.POST
         # 验证参数合法性
@@ -114,16 +117,17 @@ class RegisterView(View):
             return redirect('users:登录')
         else:
             # 不合法
-            return render(request,'users/register.html',context={'form':form})
+            return render(request, 'users/register.html', context={'form': form})
 
 
 # 登录
 # def login(request):
 #     return render(request, 'users/login.html')
 class LoginView(View):
-    def get(self,request):
-        return render(request,'users/login.html')
-    def post(self,request):
+    def get(self, request):
+        return render(request, 'users/login.html')
+
+    def post(self, request):
         # 接收参数
         data = request.POST
 
@@ -138,7 +142,8 @@ class LoginView(View):
             request.session.set_expiry(0)  # 关闭浏览器session消失
             return redirect('index')
         else:
-            return render(request,'users/login.html',context={'form':form})
+            return render(request, 'users/login.html', context={'form': form})
+
 
 # 个人中心
 @check_login
@@ -173,10 +178,11 @@ def address(request):
 def collect(request):
     return render(request, 'users/collect.html')
 
+
 # 收藏编辑
 @check_login
 def collect_edit(request):
-    return render(request,'users/collect-edit.html')
+    return render(request, 'users/collect-edit.html')
 
 
 # 全部订单
@@ -197,7 +203,7 @@ def infor(request):
         gender = request.POST.get("gender")
         school = request.POST.get("school")
         home_address = request.POST.get("home_address")
-        detail_address =request.POST.get("detail_address")
+        detail_address = request.POST.get("detail_address")
         # 修改数据库
         Users.objects.filter(id=id).update(nickName=nickName,
                                            gender=gender,
@@ -250,19 +256,21 @@ def forgetpassword(request):
         # 到数据库中查询用户信息
         user_info = Users.objects.filter(id=user_id).first()
         context = {
-            'user':user_info
+            'user': user_info
         }
-        return render(request, 'users/forgetpassword.html',context=context)
+        return render(request, 'users/forgetpassword.html', context=context)
+
 
 # 确认订单
 @check_login
 def tureorder(request):
     return render(request, 'users/tureorder.html')
 
+
 # 完成支付
 @check_login
 def pay(request):
-    return render(request,'users/pay.html')
+    return render(request, 'users/pay.html')
 
 
 # 积分
@@ -320,13 +328,35 @@ def records(request):
 # 安全设置
 @check_login
 def saftystep(request):
-
     return render(request, 'users/saftystep.html')
+
 
 # 修改密码
 @check_login
 def changePassword(request):
-    return render(request,'users/password.html')
+    if request.method == 'POST':
+        # 接收数据
+        data = request.POST
+        # 清洗数据
+        form = ChangeModelForm(data)
+        # 验证合法性
+        if form.is_valid():
+            # 获得清洗后的数据
+            # cleaned_data = form.cleaned_data
+            # 保存数据库
+            newpassword = form.cleaned_data.get('newpassword1')
+            newpassword1 = set_password(newpassword)
+            Users.objects.filter(pk=form.cleaned_data.get('user_id')).update(password=newpassword1)
+            request.session.flush()
+            return redirect('users:登录')
+        else:
+            errors = form.errors
+            context = {
+                "errors": errors
+            }
+            return render(request, 'users/password.html', context=context)
+    else:
+        return render(request, 'users/password.html')
 
 
 # 系统设置
@@ -345,5 +375,3 @@ def ygq(request):
 @check_login
 def yhq(request):
     return render(request, 'users/yhq.html')
-
-

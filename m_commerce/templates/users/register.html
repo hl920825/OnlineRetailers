@@ -20,6 +20,7 @@
     <form action="" method="post" >
     {% csrf_token %}
 	    <div style="height: 3rem;"></div>
+
 	    <input type="text" name="phoneNum" id="phoneNum" value="{{ request.POST.phoneNum }}"  placeholder="请输入手机号" class="login-name">
         <p class="am-text-danger">{{ form.errors.phoneNum.0 }}</p>
 	    <input type="password" name="password"  placeholder="请输入密码" class="login-password">
