@@ -4,19 +4,19 @@
 {% block content %}
 <header data-am-widget="header" class="am-header am-header-default sq-head1">
 			<div class="am-header-left am-header-nav">
-		        <a href="city.html" class="" style="color: #fff;">
+		        <a href="{% url 'commodity:城市定位' %}" class="" style="color: #fff;">
 			        <img src="{% static 'images/city.png' %}" />
 			        <p style="font-size: 12px; margin-top: -35px;">南昌</p>
 			    </a>
 		   </div>
 			<h1 class="am-header-title1">
 		        <div class="search-box">
-		           <a href="village.html" class="index-search">南昌大学前湖校区∨</a>
+		           <a href="{% url 'commodity:学校' %}" class="index-search">南昌大学前湖校区∨</a>
 		         <!--  <input type="submit" value="" class="search-icon" /> -->
 		        </div>
 		    </h1>
 			<div class="am-header-right am-header-nav">
-			    <a href="tidings.html" class="">
+			    <a href="{% url 'commodity:消息' %}" class="">
 		         <div class="messgae"><span>10</span></div>
 		        </a>
 			</div>

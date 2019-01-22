@@ -358,6 +358,10 @@ def changePassword(request):
     else:
         return render(request, 'users/password.html')
 
+# 绑定新手机号
+def boundphone(request):
+    return render(request,'users/boundphone.html')
+
 
 # 系统设置
 @check_login
@@ -375,3 +379,8 @@ def ygq(request):
 @check_login
 def yhq(request):
     return render(request, 'users/yhq.html')
+
+# 安全退出
+def safquit(request):
+    request.session.flush()
+    return render(request,'users/login.html')
