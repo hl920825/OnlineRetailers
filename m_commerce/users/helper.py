@@ -9,6 +9,14 @@ from aliyunsdkcore.profile import region_provider
 from m_commerce.settings import SECRET_KEY, ACCESS_KEY_ID, ACCESS_KEY_SECRET
 
 
+# 保存session的方法
+def login(request,user):
+    request.session['ID'] = user.pk
+    request.session['phoneNum'] = user.phoneNum
+    request.session['head'] = user.head
+    # 关闭浏览器就消失
+    request.session.set_expiry(0)
+
 def check_login(func):
     def verify_login(request,*args,**kwargs):
         # 判断是否登录

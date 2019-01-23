@@ -9,11 +9,11 @@
 	    </header>
 	    <div style="height: 49px;"></div>
 	    <div class="member">
-	    	<div class="mem-tit">15828495573
+	    	<div class="mem-tit">{{request.session.phoneNum}}
 	    		<a href="{% url 'users:系统设置' %}" class="step"><img src="{% static 'images/step.png' %}" width="26"/></a>
 	    	</div>
 	    	<div class="mem-pic">
-		    	<div class="mem-pic-bg" style="background-image: url(images/memtx.png);"></div>
+		    	<div class="mem-pic-bg" style="background-image: url({{ MEDIA_URL }}{{request.session.head}});"></div>
 	    	</div>
 	    	<ul class="member-menu">
 			<li>

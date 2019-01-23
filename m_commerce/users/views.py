@@ -6,7 +6,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 # Create your views here.
 from django.views import View
-from users.helper import check_login, send_sms
+from users.helper import check_login, send_sms, login
 from users import set_password
 from users.forms import RegisterModelForm, LoginModelForm, ForgetModelForm, ChangeModelForm
 from users.models import Users
@@ -139,6 +139,7 @@ class LoginView(View):
             user = form.cleaned_data.get('user')
             request.session['ID'] = user.pk
             request.session['phoneNum'] = user.phoneNum
+            request.session['head'] = user.head
             request.session.set_expiry(0)  # 关闭浏览器session消失
             return redirect('index')
         else:
@@ -198,19 +199,29 @@ def allorder(request):
 def infor(request):
     if request.method == 'POST':
         # 获取数据修改数据库
-        id = request.session.get("ID")
+        user_id = request.session.get("ID")
+        head = request.FILES.get('head')
         nickName = request.POST.get("nickName")
         gender = request.POST.get("gender")
         school = request.POST.get("school")
         home_address = request.POST.get("home_address")
         detail_address = request.POST.get("detail_address")
+        # 先保存图片
+        user = Users.objects.get(pk=user_id)
+        if head is not None:
+            user.head = head
+            user.save()
         # 修改数据库
-        Users.objects.filter(id=id).update(nickName=nickName,
+        Users.objects.filter(id=user_id).update(nickName=nickName,
                                            gender=gender,
                                            school=school,
                                            home_address=home_address,
                                            detail_address=detail_address)
-        return redirect("users:个人资料")
+        user = Users.objects.get(pk=user_id)
+        # 同时修改session
+        login(request,user)
+
+        return redirect("users:个人中心")
 
     else:
         # 通过session得到用户信息
