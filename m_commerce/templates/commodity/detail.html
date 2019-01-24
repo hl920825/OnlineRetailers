@@ -1,18 +1,19 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 	<head>
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<title>超市</title>
+		<title>详情</title>
         <meta name="description" content="">
         <meta name="keywords" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
         <meta name="renderer" content="webkit">
         <meta http-equiv="Cache-Control" content="no-siteapp" />
         <link rel="icon" type="image/png" href="/theme/default/images/favicon.png">
-		<link href="css/amazeui.min.css" rel="stylesheet" type="text/css" />
-		<link href="css/style.css" rel="stylesheet" type="text/css" />
-		<script src="js/jquery-1.10.2.min.js"></script>
+		<link href="{% static 'css/amazeui.min.css' %}" rel="stylesheet" type="text/css" />
+		<link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css" />
+		<script src="{% static 'js/jquery-1.10.2.min.js' %}"></script>
 		<script>
         	function changeImage(){
               document.getElementById("imgflag").src="images/redherat.png";
@@ -40,15 +41,19 @@
 	    <!--图片轮换-->
 		<div class="am-slider am-slider-default" data-am-flexslider id="demo-slider-0">
 		  <ul class="am-slides">
-		    <li><img src="images/pic.png" /></li>
-		    <li><img src="images/pic.png" /></li>
+              {% for gg in goods.goodsphotos_set.all %}
+                    <li><img src="{{ MEDIA_URL }}{{gg.image}}" /></li>
+              {% endfor %}
+{#                <li><img src="{% static 'images/三胖蛋.png' %}" alt=""></li>#}
+
+
 		  </ul>
 		</div>
 		<div class="detal-info" style="position: relative; width: 100%;">
-			<p>特价武夷山桐木关正山小种红茶高档礼盒</p>
-			<h2>商城价：<span>￥52.00</span></h2>
+			<p>{{goods.goods_spu.name}}</p>
+			<h2>商城价：<span>￥{{ goods.price }}</span></h2>
 			<div class="heart">
-				<img src="images/herat.png" width="25" id="imgflag" onclick="changeImage()" />
+				<img src="{% static 'images/herat.png' %}" width="25" id="imgflag" onclick="changeImage()" />
 				<p>收藏</p>
 			</div>
 		</div>
@@ -71,10 +76,10 @@
 		
 		  <div class="am-tabs-bd">
 		    <div class="am-tab-panel am-fade am-in am-active detail " id="tab1" >
-		            <p>产地: 中国大陆</p>
-                    <p>功效: 瘦身,美容,提神,抗氧化,保健,降三高</p>
-                    <p>保质期: >2年</p>
-                    <img src="images/test11.png" />
+		            <p>{{goods.goods_spu.desc|safe}}</p>
+{#                    <p>功效: 瘦身,美容,提神,抗氧化,保健,降三高</p>#}
+{#                    <p>保质期: >2年</p>#}
+{#                    <img src="images/test11.png" />#}
 		    </div>
 		    <div class="am-tab-panel am-fade detail " id="tab2">
 		         <!--<div class="comment">
@@ -157,7 +162,7 @@
  
  
  
-<script src="js/jquery.min.js"></script>
-<script src="js/amazeui.min.js"></script>
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/amazeui.min.js' %}"></script>
 	</body>
 </html>

@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'shopping_car.apps.ShoppingCarConfig',
     'indent.apps.IndentConfig',
     'commodity.apps.CommodityConfig',
+    'ckeditor',  # 添加ckeditor富文本编辑器
+    'ckeditor_uploader',  # 添加ckeditor富文本编辑器文件上传部件
 ]
 
 MIDDLEWARE = [
@@ -128,6 +130,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR,'static')
 ]
+# STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 CACHES = {
     "default": {
@@ -148,3 +151,10 @@ ACCESS_KEY_SECRET = "FzORQ587PgGBoOAdmxzCjaxQi8klUi"
 # 配置上传图片
 MEDIA_URL = "/static/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, 'static/media')
+
+CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+    },
+}

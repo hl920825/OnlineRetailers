@@ -20,9 +20,12 @@ from m_commerce.views import index
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    # 三方插件
+    url(r'^ckeditor/', include("ckeditor_uploader.urls")),
     url(r'^index/$',index,name="index"),
     url(r'^users/',include('users.urls',namespace='users')),
     url(r'^commodity/',include('commodity.urls',namespace='commodity')),
     url(r'^shopping_car/',include('shopping_car.urls',namespace='shopping_car')),
     url(r'^indent/',include('indent.urls',namespace='indent')),
+    url(r'^$',index),
 ]

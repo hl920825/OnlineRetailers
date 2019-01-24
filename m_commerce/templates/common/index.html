@@ -6,12 +6,12 @@
 			<div class="am-header-left am-header-nav">
 		        <a href="{% url 'commodity:城市定位' %}" class="" style="color: #fff;">
 			        <img src="{% static 'images/city.png' %}" />
-			        <p style="font-size: 12px; margin-top: -35px;">南昌</p>
+			        <p style="font-size: 12px; margin-top: -35px;" id="info">全国</p>
 			    </a>
 		   </div>
 			<h1 class="am-header-title1">
 		        <div class="search-box">
-		           <a href="{% url 'commodity:学校' %}" class="index-search">南昌大学前湖校区∨</a>
+		           <a href="{% url 'commodity:学校' %}" class="index-search">小新潮air</a>
 		         <!--  <input type="submit" value="" class="search-icon" /> -->
 		        </div>
 		    </h1>
@@ -25,8 +25,12 @@
 <!--图片轮换-->
 <div class="am-slider am-slider-default" data-am-flexslider id="demo-slider-0">
   <ul class="am-slides">
-    <li><img src="{% static 'images/banner.png' %}" /></li>
-    <li><img src="{% static 'images/banner.png' %}" /></li>
+      {% for car in carousel %}
+            <li><img src="{{ MEDIA_URL }}{{car.image}}" /></li>
+      {% endfor %}
+
+
+{#    <li><img src="{% static 'images/banner.png' %}" /></li>#}
   </ul>
 </div>
 <!--导航-->
@@ -125,60 +129,7 @@
             </a>
         </div>
       </li>
-        <li>
-        <div class="am-gallery-item">
-            <a href="detail.html" class="">
-              <img src=" {% static 'images/test2.png' %}" />
-                <h3 class="am-gallery-title">法国加力果12个装 进口新鲜水果 嘎啦苹果 包邮</h3>
-                <div class="am-gallery-desc">￥45.8</div>
-            </a>
-        </div>
-      </li>
-      <li>
-        <div class="am-gallery-item">
-            <a href="detail.html" class="">
-              <img src=" {% static 'images/test21.png' %}" />
-                <h3 class="am-gallery-title">法国加力果12个装 进口新鲜水果 嘎啦苹果 包邮</h3>
-                <div class="am-gallery-desc">￥45.8</div>
-            </a>
-        </div>
-      </li>
-       <li>
-        <div class="am-gallery-item">
-            <a href="detail.html" class="">
-              <img src=" {% static 'images/test.png' %}" />
-                <h3 class="am-gallery-title">猪骨头棒新鲜生鲜肉制品猪大骨头筒骨熬汤佳品500g</h3>
-                <div class="am-gallery-desc">￥52</div>
-            </a>
-        </div>
-      </li>
-      <li>
-        <div class="am-gallery-item">
-            <a href="detail.html" class="">
-              <img src="{% static 'images/test1.png' %}" />
-                <h3 class="am-gallery-title">冻品批发大江鸡腿 冷鲜鸡腿放心食材1kg 冷冻食材</h3>
-                <div class="am-gallery-desc">￥39</div>
-            </a>
-        </div>
-      </li>
-        <li>
-        <div class="am-gallery-item">
-            <a href="detail.html" class="">
-              <img src=" {% static 'images/test2.png' %}" />
-                <h3 class="am-gallery-title">法国加力果12个装 进口新鲜水果 嘎啦苹果 包邮</h3>
-                <div class="am-gallery-desc">￥45.8</div>
-            </a>
-        </div>
-      </li>
-      <li>
-        <div class="am-gallery-item">
-            <a href="detail.html" class="">
-              <img src=" {% static 'images/test21.png' %}" />
-                <h3 class="am-gallery-title">法国加力果12个装 进口新鲜水果 嘎啦苹果 包邮</h3>
-                <div class="am-gallery-desc">￥45.8</div>
-            </a>
-        </div>
-      </li>
+
   </ul>
 <!--签到-->
 <div class="qd-box">
@@ -197,7 +148,7 @@
  <div data-am-widget="navbar" class="am-navbar am-cf am-navbar-default sq-foot am-no-layout" id="">
       <ul class="am-navbar-nav am-cf am-avg-sm-5">
           <li>
-            <a href="index.html" class="curr">
+            <a href="{% url 'index' %}" class="curr">
                 <span class="am-icon-home"></span>
                 <span class="am-navbar-label">首页</span>
             </a>
@@ -241,4 +192,29 @@
 
 <script src="{% static 'js/jquery.min.js' %}"></script>
 <script src="{% static 'js/amazeui.min.js' %}"></script>
+{% endblock %}
+{% block footer %}
+<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.12&key=6586d8732ad9266808f9803dcdf8a688&plugin=AMap.CitySearch"></script>
+<script type="text/javascript">
+    //获取用户所在城市信息
+    function showCityInfo() {
+        //实例化城市查询类
+        var citysearch = new AMap.CitySearch();
+        //自动获取用户IP，返回当前城市
+        citysearch.getLocalCity(function(status, result) {
+            if (status === 'complete' && result.info === 'OK') {
+                if (result && result.city && result.bounds) {
+                    var cityinfo = result.city;
+                    var citybounds = result.bounds;
+                    document.getElementById('info').innerHTML = ''+cityinfo;
+                    //地图显示当前城市
+                    map.setBounds(citybounds);
+                }
+            } else {
+                document.getElementById('info').innerHTML = result.info;
+            }
+        });
+    }
+    showCityInfo();
+</script>
 {% endblock %}
