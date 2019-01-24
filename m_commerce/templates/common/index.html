@@ -26,7 +26,7 @@
 <div class="am-slider am-slider-default" data-am-flexslider id="demo-slider-0">
   <ul class="am-slides">
       {% for car in carousel %}
-            <li><img src="{{ MEDIA_URL }}{{car.image}}" /></li>
+          <li><a href="{% url 'commodity:商品详情' car.goodsSku_id.id %}"><img src="{{ MEDIA_URL }}{{car.image}}" /></a></li>
       {% endfor %}
 
 
@@ -79,7 +79,7 @@
       </li>
       <li>
         <div class="am-gallery-item">
-            <a href="{% url 'commodity:商品分类' %}" class="">
+            <a href="{% url 'commodity:商品分类' '' '' %}" class="">
               <img src="{% static 'images/icon5.png' %}" />
               <p>超市</p>
             </a>
@@ -106,31 +106,29 @@
   <!--不规则展示-->
   <div class="h-line"></div>
   <!-- 特色专区-->
-  <div class="sq-title">
- 	<img src="{% static 'images/ts.png' %}" width="26"/>
- 	特色专区
-  </div>
-  <ul data-am-widget="gallery" class="am-gallery pro-list am-avg-sm-2 am-avg-md-2 am-avg-lg-4 am-gallery-default"  >
-      <li>
-        <div class="am-gallery-item">
-            <a href="detail.html" class="">
-              <img src=" {% static 'images/test.png' %}" />
-                <h3 class="am-gallery-title">猪骨头棒新鲜生鲜肉制品猪大骨头筒骨熬汤佳品500g</h3>
-                <div class="am-gallery-desc">￥52</div>
-            </a>
-        </div>
-      </li>
-      <li>
-        <div class="am-gallery-item">
-            <a href="detail.html" class="">
-              <img src=" {% static 'images/test1.png' %}" />
-                <h3 class="am-gallery-title">冻品批发大江鸡腿 冷鲜鸡腿放心食材1kg 冷冻食材</h3>
-                <div class="am-gallery-desc">￥39</div>
-            </a>
-        </div>
-      </li>
 
-  </ul>
+{% for foo in activity %}
+    <div class="sq-title">
+ 	<img src="{% static 'images/ts.png' %}" width="26"/>
+    {{ foo.title }}
+      </div>
+    <ul data-am-widget="gallery" class="am-gallery pro-list am-avg-sm-2 am-avg-md-2 am-avg-lg-4 am-gallery-default"  >
+    {% for f in foo.goods_sku.all %}
+
+            <li>
+                <div class="am-gallery-item">
+                    <a href="{% url 'commodity:商品详情' f.id %}" class="">
+                        <img src=" {{ MEDIA_URL }}{{f.logo}}"/>
+                        <h3 class="am-gallery-title">{{f.goods_name}}</h3>
+                        <div class="am-gallery-desc">￥{{f.price}}</div>
+                    </a>
+                </div>
+            </li>
+
+    {% endfor %}
+    </ul>
+  {% endfor %}
+
 <!--签到-->
 <div class="qd-box">
 	<div class="popup-title">

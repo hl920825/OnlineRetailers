@@ -15,7 +15,7 @@ admin.site.register(Activity)
 @admin.register(GoodsClass)
 class GoodsClassAdmin(admin.ModelAdmin):
     # 自定义后台
-    list_display = ['id','class_name','class_intro','change_time']
+    list_display = ['id','class_name','class_intro','change_time','order']
     list_display_links = ['id','class_name','class_intro']
 
 class GoodsPhotosInline(admin.TabularInline):

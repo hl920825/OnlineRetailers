@@ -9,6 +9,7 @@ from db.base_model import BaseModel
 class GoodsClass(BaseModel):
     class_name = models.CharField(max_length=50,verbose_name='分类名')
     class_intro = models.CharField(max_length=250,verbose_name='分类介绍',null=True)
+    order = models.SmallIntegerField(default=0,verbose_name='排序')
 
     def __str__(self):
         return self.class_name

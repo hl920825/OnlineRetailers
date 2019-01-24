@@ -206,6 +206,8 @@ def infor(request):
         school = request.POST.get("school")
         home_address = request.POST.get("home_address")
         detail_address = request.POST.get("detail_address")
+        birthday = request.POST.get('birthday')
+
         # 先保存图片
         user = Users.objects.get(pk=user_id)
         if head is not None:
@@ -215,6 +217,7 @@ def infor(request):
         Users.objects.filter(id=user_id).update(nickName=nickName,
                                            gender=gender,
                                            school=school,
+                                            birthday=birthday,
                                            home_address=home_address,
                                            detail_address=detail_address)
         user = Users.objects.get(pk=user_id)
@@ -276,6 +279,10 @@ def forgetpassword(request):
 @check_login
 def tureorder(request):
     return render(request, 'users/tureorder.html')
+
+# 再次确认
+def order(request):
+    return render(request,'users/order.html')
 
 
 # 完成支付
