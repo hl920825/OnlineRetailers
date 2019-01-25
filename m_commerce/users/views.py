@@ -141,7 +141,16 @@ class LoginView(View):
             request.session['phoneNum'] = user.phoneNum
             request.session['head'] = user.head
             request.session.set_expiry(0)  # 关闭浏览器session消失
-            return redirect('index')
+
+            referer = request.session.get('referer')
+            if referer:
+                # 跳转回去
+                # 删除session
+                del request.session['referer']
+                return redirect(referer)
+            else:
+                # 跳转回个人中心
+                return redirect('users:个人中心')
         else:
             return render(request, 'users/login.html', context={'form': form})
 

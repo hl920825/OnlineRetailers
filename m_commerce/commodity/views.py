@@ -10,6 +10,9 @@ from commodity.models import GoodsClass,GoodsPhotos,GoodsSku,GoodsUnit,GoodsSpu
 
 
 # 商品分类
+from shopping_car.cart_helper import get_cart_count
+
+
 def comcategory(request,class_id,order):
     if request.method == 'GET':
         # class_id = int(class_id)
@@ -57,12 +60,15 @@ def comcategory(request,class_id,order):
         order_rule = ['pk','-sellNum','price','-price','-add_time']
         manyGoods = manyGoods.order_by(order_rule[order])
 
+        # 获取 当前用户购物车中商品的总数量
+        cart_count = get_cart_count(request)
 
         context = {
             'goods':goods,
             'manyGoods':manyGoods,
             'class_id':class_id,
             'order':order,
+            'cart_count':cart_count,
         }
         return render(request,'commodity/category.html',context=context)
 
