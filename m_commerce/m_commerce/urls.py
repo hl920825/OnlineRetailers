@@ -22,6 +22,8 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     # 三方插件
     url(r'^ckeditor/', include("ckeditor_uploader.urls")),
+    #   全文搜索框架
+    url(r'^search/', include('haystack.urls',namespace='search')),
     url(r'^index/$',index,name="index"),
     url(r'^users/',include('users.urls',namespace='users')),
     url(r'^commodity/',include('commodity.urls',namespace='commodity')),

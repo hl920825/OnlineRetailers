@@ -30,10 +30,12 @@
 					<i class="am-icon-chevron-left"></i>
 				</a>
 			</div>
-		    <div class="cate-search">
-		    	<input type="text" class="cate-input" placeholder="请输入您要的搜索的产品关键词" />
-		    	<input type="button" class="cate-btn" />
-	        </div>
+            <form action="{% url 'search:haystack_search'  %}" method="get">
+                <div class="cate-search">
+                    <input type="text" name="q" class="cate-input" placeholder="请输入您要的搜索的产品关键词"/>
+                    <input type="submit" value="" class="cate-btn"/>
+                </div>
+            </form>
 	    </header>
 	    <div style="height: 49px;"></div>
 	    <ul class="list-nav">
