@@ -7,11 +7,36 @@ from db.base_view import VerifyLoginView
 from shopping_car.cart_helper import json_msg, get_cart_count
 from django_redis import get_redis_connection
 
+# 购物车
+from users.helper import check_login
 
+
+@check_login
 def shopcart_empty(request):
+    # 连接redis
+    r = get_redis_connection()
+    # 从redis中将保存的商品及数量全部取出来
+    i = request.session.get("ID")
+    cart_key = "cart_%s"%i
+    cart = r.hgetall(cart_key)
+    # print(cart)  # 字典
+    # 使用列表存所有的商品
+    goodsList = []
+    # 遍历字典
+    for sku_id,count in cart.items():
+        sku_id = int(sku_id)
+        count = int(count)
+        # 获取商品信息
+        goods = GoodsSku.objects.get(pk=sku_id)
+        goods.count = count
+        goodsList.append(goods)
 
-    return render(request,'shopping_car/shopcart.html')
+    context = {
+        'goodsList':goodsList,
+    }
+    return render(request,'shopping_car/shopcart.html',context=context)
 
+# 添加购物车
 class AddCartView(VerifyLoginView):
     # 操作购物车,添加购物车数据
     def post(self,request):
