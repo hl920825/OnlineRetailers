@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="dataSourceStorageLocal">
-    <data-source name="db [8]" uuid="f2fbb202-80ae-46dd-9d28-01cdbc07a600">
+    <data-source name="db [2]" uuid="7dec71b5-db17-44a4-bf7e-4402c3a17cde">
       <database-info product="SQLite" version="3.25.1" jdbc-version="2.1" driver-name="SQLite JDBC" driver-version="3.25.1">
         <identifier-quote-string>&quot;</identifier-quote-string>
       </database-info>

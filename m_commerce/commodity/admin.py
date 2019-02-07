@@ -26,7 +26,7 @@ class GoodsPhotosInline(admin.TabularInline):
 class GoodsSkuAdmin(admin.ModelAdmin):
     list_display = ["id", 'goods_name', 'price', 'unit', 'num', 'sellNum', 'is_putaway', 'goods_cate']
     list_display_links = ["id", 'goods_name', 'price']
-
+    list_editable = ['is_putaway']
     search_fields = ['goods_name', 'price', 'sellNum']
     inlines = [
         GoodsPhotosInline,

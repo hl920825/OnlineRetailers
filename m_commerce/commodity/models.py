@@ -67,6 +67,8 @@ class GoodsSku(BaseModel):
     num = models.PositiveIntegerField(verbose_name='库存')
     sellNum = models.PositiveIntegerField(verbose_name='销量')
     logo = models.ImageField(upload_to='goods/%Y%m',verbose_name='商品图片')
+    # def show_logo(self):
+    #     return "<img src='{}{}'/>".format()
     is_putaway = models.BooleanField(default=False,verbose_name='是否上架')
     goods_cate = models.ForeignKey(to='GoodsClass',verbose_name='商品分类')
     goods_spu = models.ForeignKey(to='GoodsSpu',verbose_name='商品spu')

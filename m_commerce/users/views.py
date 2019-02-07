@@ -6,9 +6,12 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 # Create your views here.
 from django.views import View
+
+from indent.models import UserAddress
+from shopping_car.cart_helper import json_msg
 from users.helper import check_login, send_sms, login
 from users import set_password
-from users.forms import RegisterModelForm, LoginModelForm, ForgetModelForm, ChangeModelForm
+from users.forms import RegisterModelForm, LoginModelForm, ForgetModelForm, ChangeModelForm, AddressAddForm
 from users.models import Users
 from django_redis import get_redis_connection
 
@@ -172,14 +175,92 @@ def my_wallet(request):
 # ^gladdress/$
 @check_login
 def gladdress(request):
-    return render(request, 'users/gladdress.html')
+
+    if request.method == "GET":
+        # 获取用户的收货地址
+        user_id = request.session.get("ID")
+        user_addresses = UserAddress.objects.filter(user=user_id,is_delete=False).order_by("-isDefault")
+
+        context = {
+            "addresses":user_addresses
+        }
+
+        return render(request, 'users/gladdress.html',context=context)
 
 
 # 增加收货地址
 # ^address/$
 @check_login
 def address(request):
-    return render(request, 'users/address.html')
+    if request.method == "GET":
+        return render(request, 'users/address.html')
+    else:
+
+        if request.session.get("ID"):
+            # 获取用户id
+            id = Users.objects.get(id=request.session.get("ID")).pk
+            data = request.POST
+            form = AddressAddForm(data)  # 清洗数据
+            if form.is_valid():
+                # 得到清洗后的数据
+                cleaned_data = form.cleaned_data
+                # 判断地址是否超过6条
+                if UserAddress.objects.filter(user=id).count() < 6:
+                    # 将地址添加到数据库
+                    if cleaned_data.get('isDefault'):
+                        # 如果是设置为默认
+                        Users.objects.get(pk=id).useraddress_set.filter(is_delete=False).update(isDefault=False)
+                        Users.objects.get(pk=id).useraddress_set.create(**cleaned_data)
+                    else:
+                        # 如果不是默认就直接保存
+                        Users.objects.get(pk=id).useraddress_set.create(**cleaned_data)
+                else:
+                    context = {
+                        'error':'用户地址数不能大于6个'
+                    }
+                    return render(request,'users/address.html',context=context)
+                return redirect('users:管理收货地址')
+            else:
+                context = {
+                    'errors':form.errors,
+                    'data':data
+                }
+                return render(request,'users/address.html',context=context)
+        else:
+            return redirect('users:登录')
+
+        # # 接收参数
+        # data = request.POST.dict()  # 强转为字典
+        # # 字典保存用户   form自动转换功能
+        # data['user_id'] = request.session.get("ID")
+        #
+        # # 获取用户id
+        # user_id = request.session.get("ID")
+        # user = Users.objects.get(pk=user_id)
+        # data = request.POST
+        # form = AddressAddForm(data)
+        # # 如果数据合法
+        # if form.is_valid():
+        #     cleaned_data = form.cleaned_data
+        #     username = cleaned_data.get('username')
+        #     phone = cleaned_data.get('phone')
+        #     hcity = cleaned_data.get('hcity')
+        #     hproper = cleaned_data.get('hproper')
+        #     harea = cleaned_data.get('harea')
+        #     brief = cleaned_data.get('brief')
+        #     isDefault = cleaned_data.get('isDefault')
+        #     UserAddress.objects.create(user=user,
+        #                                username=username,
+        #                                phone=phone,
+        #                                hcity=hcity,
+        #                                hproper=hproper,
+        #                                harea=harea,
+        #                                brief=brief,
+        #                                isDefault=isDefault
+        #                                )
+        #     return JsonResponse(json_msg(0,'添加成功'))
+        # else:
+        #     return JsonResponse(json_msg(1,'添加失败',data=form.errors))
 
 
 # 我的收藏

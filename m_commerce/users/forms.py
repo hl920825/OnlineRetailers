@@ -1,3 +1,6 @@
+from django.core.validators import RegexValidator
+
+from indent.models import UserAddress
 from users import set_password
 from users.models import Users
 from django import forms
@@ -179,3 +182,45 @@ class LoginModelForm(forms.ModelForm):
         # 返回所有清洗后的数据
         self.cleaned_data['user'] = user
         return self.cleaned_data
+
+
+# 收货地址验证
+class AddressAddForm(forms.ModelForm):
+
+    phone = forms.CharField(error_messages={'required':'请填写正确手机号码!'},
+                            min_length=11,
+                            required=True,
+                            validators=[RegexValidator(r'^1[3-9]\d{9}$','手机号码格式不正确')])
+    class Meta:
+        model = UserAddress
+        exclude = ['add_time','change_time','is_delete','user']
+        error_messages = {
+            'username': {
+            "required":"请填写用户名!",
+            },
+            'brief':{
+                'required':"请填写详细地址!",
+            },
+            'hproper':{
+                "required":"请填写完整地址!",
+            },
+            'hcity': {
+                "required": "请填写完整地址!",
+            },
+            'harea': {
+                "required": "请填写完整地址!",
+            },
+        }
+
+    # def clean(self):
+    #     # 验证如果数据库里地址已经超过6报错
+    #     cleaned_data = self.cleaned_data
+    #     count = UserAddress.objects.filter(user_id=self.data.get("user_id")).count()
+    #     if count >= 6:
+    #         raise forms.ValidationError({"hproper": "收货地址最多只能保存6条"})
+    #
+    #     # 设置默认
+    #     if cleaned_data.get('isDefault'):
+    #         UserAddress.objects.filter(user=self.data.get("user_id")).update(isDefault=False)
+    #
+    #     return cleaned_data
