@@ -4,7 +4,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<title>超市</title>
+		<title>全部订单</title>
         <meta name="description" content="">
         <meta name="keywords" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -28,21 +28,37 @@
 	    </header>
 	    <div style="height: 49px;"></div>
 	    <ul class="order-style">
-	    	<li class="current"><a href="allorder.html">全部</a></li>
-	    	<li><a href="allorder.html">待付款</a></li>
-	    	<li><a href="allorder.html">退发货</a></li>
-	    	<li><a href="allorder.html">待收货</a></li>
-	    	<li><a href="allorder.html">待评价</a></li>
+	    	<li class="current"><a href="">全部</a></li>
+	    	<li><a href="">待付款</a></li>
+	    	<li><a href="">退发货</a></li>
+	    	<li><a href="">待收货</a></li>
+	    	<li><a href="">待评价</a></li>
 
 	    </ul>
+        {% for order in orders %}
+            <div class="c-comment">
+			<span class="c-comment-num">支付宝支付</span>
+			<span class="c-comment-suc">待付款</span>
+            </div>
+
+            <div class="c-comment-list" style="border: 0;">
+                <a href="{% url 'indent:订单详情' order.pk %}">
+                <p>应付金额：￥{{order.goods_totalPrice}}     实付金额：<span>￥{{order.goods_totalPrice}}</span></p>
+                <p>订单编号：{{order.order_sn}}</p>
+                <p>下单时间：{{order.add_time}}</p>
+                <p>联系店长：葫芦小金刚       <span><i class="iconfont">&#xe603</i>15828495573</span></p>
+                </a>
+            </div>
+        {% endfor %}
+
 	    <!--代付款-->
 	    <div class="c-comment">
 			<span class="c-comment-num">支付宝支付</span>
 			<span class="c-comment-suc">待付款</span>
 		</div>
-		
+
 		<div class="c-comment-list" style="border: 0;">
-			<a href="{% url 'indent:订单详情' %}">
+			<a href="">
 			<p>应付金额：￥63.0     实付金额：<span>￥63.0</span></p>
 			<p>订单编号：123456789</p>
 			<p>下单时间：2016-01-07  10：22：52</p>
@@ -60,7 +76,7 @@
 			<span class="c-comment-num">微信支付</span>
 			<span class="c-comment-suc">待收货</span>
 		</div>
-		
+
 		<div class="c-comment-list" style="border: 0;">
 			<a href="orderdetail.html">
 			<p>应付金额：￥63.0     实付金额：<span>￥63.0</span> <b>省</b><span>￥2.5</span> </p>
@@ -80,7 +96,7 @@
 			<span class="c-comment-num">余额支付</span>
 			<span class="c-comment-suc">已完成</span>
 		</div>
-		
+
 		<div class="c-comment-list" style="border: 0;">
 			<a href="orderdetail.html">
 			<p>应付金额：￥63.0     实付金额：<span>￥63.0</span> <b>省</b><span>￥2.5</span> </p>
@@ -100,7 +116,7 @@
 			<span class="c-comment-num">余额支付</span>
 			<span class="c-comment-suc">待发货</span>
 		</div>
-		
+
 		<div class="c-comment-list" style="border: 0;">
 			<a href="orderdetail.html">
 			<p>应付金额：￥63.0     实付金额：<span>￥63.0</span> <b>省</b><span>￥2.5</span> </p>
@@ -118,7 +134,7 @@
 			<span class="c-comment-num">余额支付</span>
 			<span class="c-comment-suc"> 待评价</span>
 		</div>
-		
+
 		<div class="c-comment-list" style="border: 0;">
 			<a href="orderdetail.html">
 			<p>应付金额：￥63.0     实付金额：<span>￥63.0</span> <b>省</b><span>￥2.5</span> </p>
